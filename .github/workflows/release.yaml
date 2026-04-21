@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [linux, windows, darwin]
         arch: [amd64, arm64, 386]
-        binaryname: [Delegations]
+        binaryname: [FindKerberoastables]
         # Exclude incompatible couple of GOOS and GOARCH values
         exclude:
           - os: darwin
@@ -37,11 +37,8 @@ jobs:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          mkdir -p bin
-          ls -lha
-          OUTPUT_PATH="../build/${{ matrix.binaryname }}-${{ matrix.os }}-${{ matrix.arch }}"
-          # Build the binary
-          cd ./src/;
+          mkdir -p build
+          OUTPUT_PATH="./build/${{ matrix.binaryname }}-${{ matrix.os }}-${{ matrix.arch }}"
           go build -ldflags="-s -w" -o $OUTPUT_PATH${{ matrix.os == 'windows' && '.exe' || '' }}
 
       - name: Prepare Release Assets
