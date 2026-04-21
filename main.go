@@ -42,7 +42,7 @@ func parseArgs() {
 	if err != nil {
 		fmt.Printf("[error] Error creating ArgumentGroup: %s\n", err)
 	} else {
-		group_config.NewBoolArgument(&debug, "-d", "--debug", false, "Debug mode.")
+		group_config.NewBoolArgument(&debug, "", "--debug", false, "Debug mode.")
 		group_config.NewBoolArgument(&printSPNs, "-s", "--print-spns", false, "Print SPNs.")
 	}
 	// LDAP Connection Settings
