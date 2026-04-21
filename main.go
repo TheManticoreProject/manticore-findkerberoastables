@@ -94,24 +94,21 @@ func main() {
 	kerberoastable_id := 0
 	for dn, spns := range kerberoastables {
 		kerberoastable_id += 1
-		if kerberoastable_id < lenKerberoastables {
-			logger.Print(fmt.Sprintf("├── %s\n", dn))
-		} else {
+		isLastDN := kerberoastable_id == lenKerberoastables
+		if isLastDN {
 			logger.Print(fmt.Sprintf("└── %s\n", dn))
+		} else {
+			logger.Print(fmt.Sprintf("├── %s\n", dn))
+		}
+		childIndent := "│   "
+		if isLastDN {
+			childIndent = "    "
 		}
 		for spn_id, spn := range spns {
 			if spn_id < len(spns)-1 {
-				if spn_id < len(spns) {
-					logger.Print(fmt.Sprintf("│   ├── %s\n", spn))
-				} else {
-					logger.Print(fmt.Sprintf("    ├── %s\n", spn))
-				}
+				logger.Print(fmt.Sprintf("%s├── %s\n", childIndent, spn))
 			} else {
-				if spn_id < len(spns) {
-					logger.Print(fmt.Sprintf("│   └── %s\n", spn))
-				} else {
-					logger.Print(fmt.Sprintf("    └── %s\n", spn))
-				}
+				logger.Print(fmt.Sprintf("%s└── %s\n", childIndent, spn))
 			}
 		}
 	}
