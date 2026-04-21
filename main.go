@@ -96,6 +96,9 @@ func main() {
 	}
 
 	lenKerberoastables := len(kerberoastables)
+	if debug {
+		logger.Debug(fmt.Sprintf("Found %d kerberoastable accounts.", lenKerberoastables))
+	}
 	kerberoastable_id := 0
 	for dn, spns := range kerberoastables {
 		kerberoastable_id += 1
@@ -103,6 +106,9 @@ func main() {
 			logger.Print(fmt.Sprintf("├── %s\n", dn))
 		} else {
 			logger.Print(fmt.Sprintf("└── %s\n", dn))
+		}
+		if !printSPNs {
+			continue
 		}
 		for spn_id, spn := range spns {
 			if spn_id < len(spns)-1 {
