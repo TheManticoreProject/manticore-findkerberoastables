@@ -83,11 +83,14 @@ func main() {
 	success, err := ldapSession.Connect()
 	if !success {
 		logger.Warn(fmt.Sprintf("%s\n", err))
+		return
 	}
+	defer ldapSession.Close()
 
 	kerberoastables, err := core.GetKerberoastables(ldapSession)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("%s\n", err))
+		return
 	}
 
 	lenKerberoastables := len(kerberoastables)

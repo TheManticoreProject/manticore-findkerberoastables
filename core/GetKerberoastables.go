@@ -10,11 +10,6 @@ func GetKerberoastables(ldapSession ldap.Session) (map[string][]string, error) {
 
 	results := map[string][]string{}
 
-	success, err := ldapSession.Connect()
-	if !success {
-		return results, fmt.Errorf("error connecting to LDAP: %s\n", err)
-	}
-
 	query := "(&"
 	query += "(|"
 	query += "(objectClass=computer)"
@@ -25,14 +20,12 @@ func GetKerberoastables(ldapSession ldap.Session) (map[string][]string, error) {
 	query += ")"
 	searchResults, err := ldapSession.QueryWholeSubtree("", query, []string{})
 	if err != nil {
-		return results, fmt.Errorf("error performing LDAP search: %s\n", err)
+		return results, fmt.Errorf("error performing LDAP search: %s", err)
 	}
 
 	for _, entry := range searchResults {
 		results[entry.DN] = entry.GetAttributeValues("servicePrincipalName")
 	}
-
-	ldapSession.Close()
 
 	return results, nil
 }
