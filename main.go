@@ -32,9 +32,11 @@ var (
 
 func parseArgs() {
 	ap := parser.ArgumentsParser{
-		Banner:           "FindKerberoastables - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0",
-		ShowBannerOnHelp: true,
-		ShowBannerOnRun:  true,
+		Banner: "FindKerberoastables - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0",
+		Options: parser.ArgumentsParserOptions{
+			ShowBannerOnHelp: true,
+			ShowBannerOnRun:  true,
+		},
 	}
 
 	// Configuration flags
@@ -78,8 +80,11 @@ func main() {
 		return
 	}
 
-	ldapSession := ldap.Session{}
-	ldapSession.InitSession(domainController, ldapPort, creds, useLdaps, useKerberos)
+	ldapSession, err := ldap.NewSession(domainController, ldapPort, creds, useLdaps, useKerberos)
+	if err != nil {
+		logger.Warn(fmt.Sprintf("%s\n", err))
+		return
+	}
 	success, err := ldapSession.Connect()
 	if !success {
 		logger.Warn(fmt.Sprintf("%s\n", err))

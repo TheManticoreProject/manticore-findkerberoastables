@@ -6,7 +6,7 @@ import (
 	"github.com/TheManticoreProject/Manticore/network/ldap"
 )
 
-func GetKerberoastables(ldapSession ldap.Session) (map[string][]string, error) {
+func GetKerberoastables(ldapSession *ldap.Session) (map[string][]string, error) {
 
 	results := map[string][]string{}
 
