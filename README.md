@@ -30,7 +30,7 @@ Usage: FindKerberoastables --domain <string> --username <string> [--password <st
     -H, --hashes <string>   NT/LM hashes, format is LMhash:NThash. (default: "")
 
   Configuration:
-    -d, --debug      Debug mode. (default: false)
+    --debug          Debug mode. (default: false)
     -s, --print-spns Print SPNs. (default: false)
 
   LDAP Connection Settings:
