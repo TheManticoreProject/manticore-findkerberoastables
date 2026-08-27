@@ -74,6 +74,10 @@ func parseArgs() {
 func main() {
 	parseArgs()
 
+	if useLdaps && ldapPort == 389 {
+		ldapPort = 636
+	}
+
 	creds, err := credentials.NewCredentials(authDomain, authUsername, authPassword, authHashes)
 	if err != nil {
 		fmt.Printf("[error] Error creating credentials: %s\n", err)
