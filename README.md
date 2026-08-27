@@ -1,7 +1,7 @@
 ![](./.github/banner.png)
 
 <p align="center">
-      A tool to extract the list of Kerberoastable users from an Active Directory.
+      A tool to extract and display the list of Kerberoastable users and computers (service principal names) from an Active Directory environment over LDAP.
       <br>
       <a href="https://github.com/TheManticoreProject/FindKerberoastables/actions/workflows/release.yaml" title="Build"><img alt="Build and Release" src="https://github.com/TheManticoreProject/FindKerberoastables/actions/workflows/release.yaml/badge.svg"></a>
       <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/TheManticoreProject/FindKerberoastables">
@@ -16,6 +16,8 @@
 - [x] Extract the list of Kerberoastable users from an Active Directory.
 
 ## Usage
+
+Run the tool with `-h` to display the help message:
 
 ```
 $ ./FindKerberoastables -h
@@ -40,13 +42,112 @@ Usage: FindKerberoastables --domain <string> --username <string> [--password <st
     -k, --use-kerberos          Use Kerberos instead of NTLM. (default: false)
 ```
 
-## Demonstration
+### Basic Usage
+
+Extract kerberoastable accounts from an Active Directory:
 
 ```
-$ 
+$ ./FindKerberoastables -d "EXAMPLE.local" -u "Administrator" -p "Password123!" -dc "10.0.0.1"
+FindKerberoastables - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0
+
+├── CN=WEB-SERVER,CN=Computers,DC=EXAMPLE,DC=local
+└── CN=SQL-SERVER,CN=Computers,DC=EXAMPLE,DC=local
+Done
 ```
+
+### Display Service Principal Names (SPNs)
+
+Use the `-s` or `--print-spns` flag to display the SPNs for each kerberoastable account:
+
+```
+$ ./FindKerberoastables -d "EXAMPLE.local" -u "Administrator" -p "Password123!" -dc "10.0.0.1" -s
+FindKerberoastables - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0
+
+├── CN=WEB-SERVER,CN=Computers,DC=EXAMPLE,DC=local
+│   ├── HTTP/WEB-SERVER
+│   └── HTTP/WEB-SERVER.EXAMPLE.local
+└── CN=SQL-SERVER,CN=Computers,DC=EXAMPLE,DC=local
+    ├── MSSQLSvc/SQL-SERVER
+    └── MSSQLSvc/SQL-SERVER.EXAMPLE.local:1433
+Done
+```
+
+### Using LDAPS
+
+For environments requiring LDAPS (encrypted LDAP over TLS), use the `-L` flag. The tool automatically selects port 636 when LDAPS is enabled:
+
+```
+$ ./FindKerberoastables -d "EXAMPLE.local" -u "Administrator" -p "Password123!" -dc "10.0.0.1" -L
+```
+
+### Using Pass-the-Hash
+
+Authenticate using NTLM hash instead of plaintext password:
+
+```
+$ ./FindKerberoastables -d "EXAMPLE.local" -u "Administrator" -H "aad3b435b51404eeaad3b435b51404ee:5f4dcc3b5aa765d61d8327deb882cf99" -dc "10.0.0.1" -L
+```
+
+### Using Kerberos Authentication
+
+Use Kerberos for authentication instead of NTLM:
+
+```
+$ ./FindKerberoastables -d "EXAMPLE.local" -u "Administrator" -p "Password123!" -dc "10.0.0.1" -L -k
+```
+
+## Output Format
+
+Results are printed using a tree format with ANSI color codes for better readability:
+
+- The tool displays each kerberoastable account as a distinguished name (DN)
+- When using `-s` / `--print-spns`, SPNs are shown as child items under each account
+- Tree prefixes: `├──` for items and `└──` for the last item in the tree
+- Invalid credentials or connection failures are reported with clear error messages
+
+Example output structure:
+```
+├── CN=ACCOUNT1,CN=Computers,DC=EXAMPLE,DC=local
+│   ├── SPN1/account1
+│   ├── SPN2/account1.example.local
+│   └── SPN3/account1:port
+└── CN=ACCOUNT2,CN=Users,DC=EXAMPLE,DC=local
+    └── SPN1/account2
+```
+
+## Demonstration
+
+The following demonstrates finding kerberoastable accounts in an Active Directory domain:
+
+```
+$ ./FindKerberoastables -d "MANTICORE.local" -u "Administrator" -p "MyPassword123!" -dc "192.168.1.10" -L -s
+FindKerberoastables - by Remi GASCOU (Podalirius) @ TheManticoreProject - v1.0.0
+
+[2026-08-27 10h42m35s] DEBUG: Found 2 kerberoastable accounts.
+├── CN=MANTICORE-DC1,OU=Domain Controllers,DC=MANTICORE,DC=local
+│   ├── TERMSRV/MANTICORE-DC1
+│   ├── ldap/MANTICORE-DC1.MANTICORE.local
+│   ├── DNS/MANTICORE-DC1.MANTICORE.local
+│   ├── HOST/MANTICORE-DC1
+│   ├── HOST/MANTICORE-DC1.MANTICORE.local
+│   └── GC/MANTICORE-DC1.MANTICORE.local/MANTICORE.local
+└── CN=krbtgt,CN=Users,DC=MANTICORE,DC=local
+    └── kadmin/changepw
+Done
+```
+
+This output shows:
+- Two kerberoastable accounts were found (the DC and krbtgt account)
+- The DC has multiple SPNs registered (TERMSRV, ldap, DNS, HOST, GC)
+- The krbtgt account has the standard kadmin/changepw SPN
+
+These accounts can be targeted for Kerberoast attacks to extract their service ticket TGS (Ticket Granting Service) and potentially crack their passwords offline.
 
 ## Contributing
 
 Pull requests are welcome. Feel free to open an issue if you want to add other features.
+
+## Credits
+
+- [Remi GASCOU (Podalirius)](https://github.com/Podalirius) for the creation of the [FindKerberoastables](https://github.com/TheManticoreProject/FindKerberoastables) project.
 
