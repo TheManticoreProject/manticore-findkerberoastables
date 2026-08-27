@@ -96,7 +96,7 @@ func main() {
 	}
 	defer ldapSession.Close()
 
-	kerberoastables, err := core.GetKerberoastables(ldapSession)
+	kerberoastables, err := core.GetKerberoastables(ldapSession, authDomain)
 	if err != nil {
 		logger.Warn(fmt.Sprintf("%s\n", err))
 		return
